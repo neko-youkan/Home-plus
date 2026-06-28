@@ -1,81 +1,171 @@
 import streamlit as st
 
 from components.ui import show_title
-from services.reading_service import create_book
+
+from services.reading_service import (
+    create_book,
+    get_reading_books,
+    update_book_progress,
+)
 
 
 def show():
     show_title("book", "📚", "読書記録")
 
-    with st.container(border=True):
-        st.write("### 基本情報")
+    st.write("### 操作")
 
-        title = st.text_input("タイトル")
-        author = st.text_input("著者")
+    mode = st.radio(
+        "",
+        (
+            "📖 新しい本を登録",
+            "📚 読書中の本を更新",
+        ),
+        horizontal=True,
+    )
 
-        col1, col2 = st.columns([1, 2])
+    st.divider()
 
-        with col1:
-            date_type = st.radio(
-                "日付",
-                ["読みはじめ", "読みおわり"],
-                horizontal=True,
-            )
+    if mode == "📖 新しい本を登録":
+        with st.container(border=True):
+            st.write("### 基本情報")
 
-        with col2:
-            reading_date = st.date_input("日付を選択")
+            title = st.text_input("タイトル")
+            author = st.text_input("著者")
+            start_date = st.date_input("読みはじめ")
 
-        st.divider()
+            st.divider()
 
-        st.write("### 読書情報")
+            st.write("### 読書情報")
 
-        col3, col4 = st.columns(2)
+            col1, col2 = st.columns(2)
 
-        with col3:
-            total_pages = st.number_input(
-                "総ページ数",
-                min_value=0,
-                step=1,
-            )
+            with col1:
+                total_pages = st.number_input(
+                    "総ページ数",
+                    min_value=0,
+                    step=1,
+                    key="new_total_pages",
+                )
 
-        with col4:
-            current_page = st.number_input(
-                "現在ページ",
-                min_value=0,
-                step=1,
-            )
+            with col2:
+                current_page = st.number_input(
+                    "現在ページ",
+                    min_value=0,
+                    step=1,
+                    key="new_current_page",
+                )
 
-        rating = st.slider("評価", 1, 5, 3)
+            if st.button("💾 登録", use_container_width=True):
+                if not title:
+                    st.error("タイトルを入力してください")
+                    return
 
-        memo = st.text_area("感想", height=180)
+                if total_pages != 0 and current_page > total_pages:
+                    st.error("現在ページは総ページ数以下にしてください")
+                    return
 
-        if st.button("💾 保存", use_container_width=True):
-            if not title:
-                st.error("タイトルを入力してください")
+                result = create_book(
+                    title=title,
+                    author=author,
+                    start_date=str(start_date),
+                    end_date="",
+                    rating=None,
+                    status="reading",
+                    memo="",
+                    total_pages=total_pages,
+                    current_page=current_page,
+                )
+
+                if result["success"]:
+                    st.success(result["message"])
+                else:
+                    st.error(result["message"])
+
+    elif mode == "📚 読書中の本を更新":
+        with st.container(border=True):
+            st.write("### 読書中の本を更新")
+
+            books = get_reading_books()
+
+            if not books:
+                st.info("読書中の本はありません。")
                 return
 
-            if current_page > total_pages and total_pages != 0:
+            book_options = {
+                f"{book['title']} / {book['author'] or '著者未入力'}": book
+                for book in books
+            }
+
+            selected_label = st.selectbox(
+                "本を選択",
+                list(book_options.keys()),
+            )
+
+            selected_book = book_options[selected_label]
+
+            st.divider()
+
+            st.write(f"### 📖 {selected_book['title']}")
+
+            if selected_book["author"]:
+                st.caption(f"著者：{selected_book['author']}")
+
+            if selected_book["start_date"]:
+                st.caption(f"読みはじめ：{selected_book['start_date']}")
+
+            st.divider()
+
+            st.write("### 進捗")
+
+            col1, col2 = st.columns(2)
+
+            with col1:
+                current_page = st.number_input(
+                    "現在ページ",
+                    min_value=0,
+                    value=selected_book["current_page"] or 0,
+                    step=1,
+                    key=f"current_page_{selected_book['id']}",
+                )
+
+            with col2:
+                total_pages = st.number_input(
+                    "総ページ数",
+                    min_value=0,
+                    value=selected_book["total_pages"] or 0,
+                    step=1,
+                    key=f"total_pages_{selected_book['id']}",
+                )
+
+            if total_pages != 0 and current_page > total_pages:
                 st.error("現在ページは総ページ数以下にしてください")
                 return
 
-            start_date = str(reading_date) if date_type == "読みはじめ" else ""
-            end_date = str(reading_date) if date_type == "読みおわり" else ""
+            progress = 0
+            if total_pages > 0:
+                progress = current_page / total_pages
 
-            status = "reading" if date_type == "読みはじめ" else "finished"
+            st.progress(progress)
+            st.caption(f"{current_page} / {total_pages} ページ")
 
-            result = create_book(
-                title=title,
-                author=author,
-                start_date=start_date,
-                end_date=end_date,
-                rating=rating,
-                status=status,
-                memo=memo,
-                total_pages=total_pages,
-                current_page=current_page,
-            )
+            if st.button("💾 進捗を更新", use_container_width=True):
+                result = update_book_progress(
+                    selected_book["id"],
+                    current_page,
+                    total_pages,
+                )
 
-            if result["success"]:
-                st.success(result["message"])
-            else:
-                st.error(result["message"])
+                if result["success"]:
+                    st.success(result["message"])
+                    st.rerun()
+                else:
+                    st.error(result["message"])
+
+            st.divider()
+
+            finished = st.checkbox("この本を読了した")
+
+            if finished:
+                end_date = st.date_input("読み終わり")
+                rating = st.slider("評価", 1, 5, 5)
+                memo = st.text_area("感想", height=150)
