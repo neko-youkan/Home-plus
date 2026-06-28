@@ -1,0 +1,43 @@
+:root {
+    --weather: #64B5F6;
+    --menu: #8BC34A;
+    --shopping: #FFA726;
+    --book: #9575CD;
+}
+
+/* 入力欄 */
+.stTextInput input {
+    border-radius: 12px;
+}
+
+/* ボタン */
+.stButton > button {
+    border-radius: 14px;
+    font-weight: 700;
+    border: 1px solid #3A4658;
+}
+
+/* 区切り線 */
+hr {
+    margin: 1.4rem 0;
+}
+
+/* 共通タイトル */
+.home-title {
+    font-size: 1.8rem;
+    font-weight: 800;
+    margin-bottom: 1rem;
+}
+
+.home-title .icon {
+    margin-right: 0.4rem;
+}
+
+.home-title .text {
+    color: white;
+}
+
+.icon-weather { color: var(--weather); }
+.icon-menu { color: var(--menu); }
+.icon-shopping { color: var(--shopping); }
+.icon-book { color: var(--book); }
