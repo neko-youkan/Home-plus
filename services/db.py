@@ -70,17 +70,16 @@ def create_tables():
     )
     """)
 
-    cursor.execute(
-    """
+    cursor.execute("""
     CREATE TABLE IF NOT EXISTS recipe_ingredients (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         recipe_id INTEGER NOT NULL,
         ingredient_name TEXT NOT NULL,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        created_at TEXT DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (recipe_id) REFERENCES recipes(id)
     )
     """)
-    
+
 
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS shopping_items (

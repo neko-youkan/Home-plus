@@ -4,6 +4,7 @@ from components.recipe_card import show_recipe_card
 from components.recipe_detail_card import show_recipe_detail_card
 from components.ui import show_title
 from services.recipe_service import get_all_recipes
+from services.shopping_service import generate_shopping_from_weekly_menu
 from services.weekly_menu_service import (
     fill_empty_weekly_menu_random,
     get_weekly_menu,
@@ -52,7 +53,7 @@ def show():
 
                 selected_recipe_ids[weekday_index] = selected_option["id"]
 
-            col1, col2 = st.columns(2)
+            col1, col2, col3 = st.columns(3)
 
             with col1:
                 if st.button("💾 保存", use_container_width=True):
@@ -69,6 +70,22 @@ def show():
                     if result["success"]:
                         st.success(result["message"])
                         st.rerun()
+                    else:
+                        st.error(result["message"])
+
+            with col3:
+                if st.button("🛒 買い物メモ生成", use_container_width=True):
+                    result = generate_shopping_from_weekly_menu()
+
+                    if result["success"]:
+                        st.success(result["message"])
+
+                        if result["added_items"]:
+                            with st.expander("追加した材料"):
+                                for item in result["added_items"]:
+                                    st.write(f"✅ {item}")
+
+                        # st.rerun()
                     else:
                         st.error(result["message"])
 
