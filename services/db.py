@@ -45,6 +45,15 @@ def create_tables():
     )
     """)
 
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS shopping_items (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        item_name TEXT NOT NULL,
+        is_checked INTEGER DEFAULT 0,
+        created_at TEXT DEFAULT CURRENT_TIMESTAMP
+    )
+    """)
+
     # ===== 新しいカラムはここで追加 =====
     add_column_if_not_exists(cursor, "books", "total_pages", "INTEGER")
     add_column_if_not_exists(cursor, "books", "current_page", "INTEGER")

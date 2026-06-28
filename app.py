@@ -2,6 +2,7 @@ import streamlit as st
 
 from pages import home
 from pages import reading
+from pages import shopping
 from services.db import create_tables
 
 st.set_page_config(
@@ -14,10 +15,19 @@ create_tables()
 
 page = st.sidebar.radio(
     "ページ",
-    ["🏠 Home", "📚 読書記録"],
+    [
+        "🏠 Home",
+        "🛒 買い物メモ",
+        "📚 読書記録",
+    ],
 )
 
 if page == "🏠 Home":
     home.show()
+
+elif page == "🛒 買い物メモ":
+    shopping.show()
+
 elif page == "📚 読書記録":
     reading.show()
+
