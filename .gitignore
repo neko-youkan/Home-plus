@@ -1,5 +1,17 @@
+# Virtual Environment
 .venv/
-__pycache__/
-*.pyc
-data/*.db
 .env
+
+# Python
+__pycache__/
+*.py[cod]
+
+# Database
+data/*.db
+*.sqlite3
+
+# VSCode
+.vscode/
+
+# macOS
+.DS_Store
