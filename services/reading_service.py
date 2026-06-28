@@ -99,6 +99,29 @@ def get_finished_books(limit=3):
     return books
 
 
+def get_current_reading_book():
+    """現在読書中の最新1冊を取得する"""
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute(
+        """
+        SELECT *
+        FROM books
+        WHERE status = 'reading'
+        ORDER BY created_at DESC
+        LIMIT 1
+        """
+    )
+
+    book = cursor.fetchone()
+
+    conn.close()
+
+    return book
+
+
 def update_book_progress(book_id, current_page, total_pages):
     """読書進捗を更新する"""
 

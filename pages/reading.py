@@ -4,6 +4,7 @@ from components.ui import show_title
 
 from services.reading_service import (
     create_book,
+    finish_book,
     get_reading_books,
     update_book_progress,
 )
@@ -166,6 +167,33 @@ def show():
             finished = st.checkbox("この本を読了した")
 
             if finished:
+                st.divider()
+
                 end_date = st.date_input("読み終わり")
-                rating = st.slider("評価", 1, 5, 5)
-                memo = st.text_area("感想", height=150)
+
+                rating = st.slider(
+                    "評価",
+                    1,
+                    5,
+                    5,
+                )
+
+                memo = st.text_area(
+                    "感想",
+                    height=150,
+                )
+
+                if st.button("🏁 読了として保存", use_container_width=True):
+
+                    result = finish_book(
+                        selected_book["id"],
+                        str(end_date),
+                        rating,
+                        memo,
+                    )
+
+                    if result["success"]:
+                        st.success(result["message"])
+                        st.rerun()
+                    else:
+                        st.error(result["message"])
