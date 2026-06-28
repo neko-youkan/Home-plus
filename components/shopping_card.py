@@ -2,13 +2,13 @@ import streamlit as st
 
 from components.ui import show_title
 from services.shopping_service import (
-    get_shopping_list,
-    save_shopping_list,
+    get_unchecked_shopping_list,
+    add_shopping_item,
+    update_shopping_status,
 )
 
-
 def show_shopping_card():
-    shopping = get_shopping_list()
+    shopping = get_unchecked_shopping_list()
 
     with st.container(border=True):
         show_title("shopping", "🛒", "買い物メモ")
@@ -20,12 +20,9 @@ def show_shopping_card():
 
         if st.button("➕ 追加", use_container_width=True):
             if new_item:
-                shopping.append(new_item)
+                add_shopping_item(new_item)
 
-                result = save_shopping_list(shopping)
-
-                if result["success"]:
-                    st.success(result["message"])
+                st.success("買い物メモを追加しました")
 
                 st.rerun()
 
@@ -33,11 +30,19 @@ def show_shopping_card():
 
         show_title("shopping", "🧺", "買い物リスト")
 
-        items = [item for item in shopping if item]
+        items = shopping
 
         if items:
             for item in items:
-                st.write(f"□ {item}")
+                checked = st.checkbox(
+                    item["item_name"],
+                    value=bool(item["is_checked"]),
+                    key=f"home_shopping_{item['id']}",
+                )
+
+                if checked != bool(item["is_checked"]):
+                    update_shopping_status(item["id"], int(checked))
+                    st.rerun()
         else:
             st.write("未入力")
 
