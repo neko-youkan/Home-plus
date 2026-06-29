@@ -27,9 +27,9 @@ def show():
 
     weekday_names = ["月", "火", "水", "木", "金", "土", "日"]
 
-    if now.hour < 10:
+    if 5 <= now.hour < 10:
         greeting = "おはようございます ☀️"
-    elif now.hour < 18:
+    elif 10 <= now.hour < 18:
         greeting = "こんにちは 🌿"
     else:
         greeting = "こんばんは 🌙"
