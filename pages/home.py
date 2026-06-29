@@ -1,4 +1,5 @@
-from datetime import date, datetime
+from datetime import datetime
+from zoneinfo import ZoneInfo
 
 import streamlit as st
 from streamlit_js_eval import streamlit_js_eval
@@ -13,8 +14,9 @@ from components.recipe_card import show_recipe_card
 
 
 def show():
-    today = date.today()
-    now = datetime.now()
+    # 日本時間で取得
+    now = datetime.now(ZoneInfo("Asia/Tokyo"))
+    today = now.date()
 
     screen_width = streamlit_js_eval(
         js_expressions="window.innerWidth",
@@ -22,8 +24,6 @@ def show():
     )
 
     is_mobile = screen_width is not None and screen_width <= 768
-
-
 
     weekday_names = ["月", "火", "水", "木", "金", "土", "日"]
 
