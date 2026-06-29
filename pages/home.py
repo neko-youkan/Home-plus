@@ -23,8 +23,7 @@ def show():
 
     is_mobile = screen_width is not None and screen_width <= 768
 
-    st.write(f"画面幅: {screen_width}")
-    st.write(f"スマホ判定: {is_mobile}")
+
 
     weekday_names = ["月", "火", "水", "木", "金", "土", "日"]
 
