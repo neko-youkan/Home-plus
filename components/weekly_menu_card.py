@@ -3,10 +3,9 @@ import streamlit as st
 from components.ui import show_title
 from services.weekly_menu_service import get_weekly_menu
 
-
 def show_weekly_menu_card():
     with st.container(border=True):
-        show_title("weekly_menu", "📅", "今週の献立")
+        show_title("meal", "📅", "今週の献立")
 
         week = get_weekly_menu()
 

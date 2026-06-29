@@ -1,25 +1,40 @@
 import streamlit as st
 
-COLORS = {
-    "weather": "#64B5F6",
-    "garbage": "#C97A40",
-    "menu": "#8BC34A",
-    "shopping": "#FFA726",
-    "book": "#9575CD",
-}
 
+def show_title(kind, icon, title, right_text=None):
+    """カードタイトルを表示"""
 
-def show_title(kind, icon, title):
-    color = COLORS.get(kind, "#FFFFFF")
+    if right_text:
+        html = f"""
+<div class="home-title {kind}">
+    <div class="home-title-row">
+        <div class="home-title-left">
+            <div class="home-title-main">
+                <span class="icon">{icon}</span>
+                <span>{title}</span>
+            </div>
+            <div class="home-title-line"></div>
+        </div>
+        <div class="home-title-right">
+            {right_text}
+        </div>
+    </div>
+</div>
+"""
+    else:
+        html = f"""
+<div class="home-title {kind}">
+    <div class="home-title-left">
+        <div class="home-title-main">
+            <span class="icon">{icon}</span>
+            <span>{title}</span>
+        </div>
+        <div class="home-title-line"></div>
+    </div>
+</div>
+"""
 
     st.markdown(
-        f"""
-        <h2 style="margin-bottom:0.8rem;font-weight:700;">
-            {icon}
-            <span style="color:{color};">
-                {title}
-            </span>
-        </h2>
-        """,
+        html,
         unsafe_allow_html=True,
     )

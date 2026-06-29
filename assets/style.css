@@ -1,43 +1,324 @@
+/* ========= フォント ========= */
+
+html,
+body,
+[class*="css"] {
+    font-family:
+        "BIZ UDPゴシック",
+        "BIZ UDPGothic",
+        "Yu Gothic UI",
+        "Yu Gothic",
+        sans-serif;
+}
+
+
+/* ========= カラー ========= */
+
 :root {
-    --weather: #64B5F6;
-    --menu: #8BC34A;
-    --shopping: #FFA726;
-    --book: #9575CD;
+    --weather: #38BDF8;
+    --garbage: #ff69b4;
+    --meal: #84CC16;
+    --shopping: #F59E0B;
+    --reading: #ae70e8;
 }
 
-/* 入力欄 */
-.stTextInput input {
-    border-radius: 12px;
-}
 
-/* ボタン */
-.stButton > button {
-    border-radius: 14px;
-    font-weight: 700;
-    border: 1px solid #3A4658;
-}
+/* ========= タイトル ========= */
 
-/* 区切り線 */
-hr {
-    margin: 1.4rem 0;
-}
-
-/* 共通タイトル */
 .home-title {
-    font-size: 1.8rem;
+    margin: 0 0 1rem 0;
+}
+
+.home-title-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.home-title-left {
+    display: inline-block;
+}
+
+.home-title-main {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    color: #FFFFFF;
+
+    font-size: 1.75rem;
     font-weight: 800;
-    margin-bottom: 1rem;
+    line-height: 1.2;
+    letter-spacing: 0.3px;
+}
+
+.home-title-right {
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 0.95rem;
+    font-weight: 600;
+    white-space: nowrap;
+
+    padding-top: 0.35rem;
 }
 
 .home-title .icon {
-    margin-right: 0.4rem;
+    font-size: 1.65rem;
 }
 
-.home-title .text {
-    color: white;
+.home-title-line {
+    display: block;
+    width: 260px;
+    height: 4px;
+
+    margin-top: 8px;
+
+    border-radius: 999px;
 }
 
-.icon-weather { color: var(--weather); }
-.icon-menu { color: var(--menu); }
-.icon-shopping { color: var(--shopping); }
-.icon-book { color: var(--book); }
+.home-title.weather .home-title-line {
+    background: var(--weather);
+}
+
+.home-title.garbage .home-title-line {
+    background: var(--garbage);
+}
+
+.home-title.meal .home-title-line {
+    background: var(--meal);
+}
+
+.home-title.shopping .home-title-line {
+    background: var(--shopping);
+}
+
+.home-title.reading .home-title-line {
+    background: var(--reading);
+}
+
+/* ========= カード ========= */
+
+div[data-testid="stVerticalBlockBorderWrapper"] {
+    border-radius: 18px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: #14171c;
+    padding: 20px;
+    transition: 0.2s;
+}
+
+div[data-testid="stVerticalBlockBorderWrapper"]:hover {
+    border-color: rgba(255, 255, 255, 0.16);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+}
+
+
+/* ========= ボタン ========= */
+
+.stButton > button {
+    width: 100%;
+    border-radius: 12px;
+    font-weight: 700;
+    transition: 0.2s;
+
+    min-height: 48px;
+    font-size: 1rem;
+}
+
+.stButton > button:hover {
+    transform: translateY(-1px);
+}
+
+
+/* ========= 入力欄 ========= */
+
+.stTextInput input,
+.stTextArea textarea {
+    border-radius: 12px;
+}
+
+
+/* ========= 区切り線 ========= */
+
+hr {
+    margin: 1.5rem 0;
+    opacity: 0.2;
+}
+
+
+/* ========= ゴミの日カード ========= */
+
+.garbage-date {
+    margin-top: 0.4rem;
+    margin-bottom: 0.8rem;
+
+    color: rgba(255, 255, 255, 0.75);
+
+    font-size: 1.05rem;
+    font-weight: 700;
+}
+
+.garbage-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    margin: 0.35rem 0;
+
+    color: #FFFFFF;
+
+    font-size: 1.8rem;
+    font-weight: 800;
+    line-height: 1.3;
+}
+
+.garbage-icon {
+    font-size: 1.7rem;
+}
+
+/* ========= 天気カード ========= */
+
+.weather-main {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+
+    min-height: 110px;
+
+    margin-top: -18px;
+}
+
+.weather-icon {
+    font-size: 3rem;
+}
+
+.weather-text {
+    font-size: 2.8rem;
+    font-weight: 800;
+    line-height: 1.2;
+    color: #FFFFFF;
+}
+
+.weather-right {
+    text-align: right;
+    margin-top: 0.6rem;
+}
+
+.weather-label {
+    font-size: 1rem;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 0.6rem;
+}
+
+.weather-temp {
+    font-size: 2.8rem;
+    font-weight: 800;
+    line-height: 1.2;
+    color: #FFFFFF;
+}
+
+/* ========= Homeヘッダー ========= */
+
+.home-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    margin-bottom: 1.6rem;
+}
+
+.home-header-title {
+    color: #FFFFFF;
+    font-size: 3rem;
+    font-weight: 900;
+    line-height: 1.1;
+}
+
+.home-header-info {
+    text-align: right;
+    color: rgba(255, 255, 255, 0.75);
+    font-size: 0.95rem;
+    font-weight: 600;
+    line-height: 1.7;
+}
+
+/* ========= スマホ対応 ========= */
+
+@media screen and (max-width: 768px) {
+
+    .home-header {
+        display: block;
+        margin-bottom: 1.2rem;
+    }
+
+    .home-header-title {
+        font-size: 2.6rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .home-header-info {
+        text-align: left;
+        font-size: 0.95rem;
+        line-height: 1.6;
+    }
+
+    .home-title-row {
+        display: block;
+    }
+
+    .home-title-main {
+        font-size: 1.55rem;
+    }
+
+    .home-title-right {
+        padding-top: 0.4rem;
+        font-size: 0.9rem;
+        white-space: normal;
+    }
+
+    .home-title-line {
+        width: 100%;
+        max-width: 260px;
+    }
+
+    div[data-testid="stVerticalBlockBorderWrapper"] {
+        padding: 18px;
+        border-radius: 16px;
+    }
+
+    div[data-testid="stVerticalBlockBorderWrapper"]:hover {
+        transform: none;
+    }
+
+    .weather-main {
+        gap: 12px;
+        min-height: 90px;
+        margin-top: -8px;
+    }
+
+    .weather-icon {
+        font-size: 2.6rem;
+    }
+
+    .weather-text {
+        font-size: 2.25rem;
+    }
+
+    .weather-temp {
+        font-size: 2.4rem;
+    }
+
+    .garbage-item {
+        font-size: 1.55rem;
+    }
+
+    .stButton > button {
+        min-height: 44px;
+        font-size: 1rem;
+    }
+
+    hr {
+        margin: 1.2rem 0;
+    }
+}

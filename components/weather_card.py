@@ -8,13 +8,32 @@ def show_weather_card():
     weather = get_weather()
 
     with st.container(border=True):
-        show_title("weather", "🌤️", "今日の天気")
+        show_title(
+            "weather",
+            "🌤️",
+            "今日の天気",
+            right_text=f"📍 {weather['location']}",
+        )
 
-        col1, col2 = st.columns([3, 1])
+        left, right = st.columns([3, 2])
 
-        with col1:
-            st.write(f"📍 {weather['location']}")
-            st.write(weather["weather"])
+        with left:
+            st.markdown(
+                f"""
+<div class="weather-main">
+    <span class="weather-icon">☀️</span>
+    <span class="weather-text">{weather['weather']}</span>
+</div>
+""",
+                unsafe_allow_html=True,
+            )
 
-        with col2:
-            st.metric("気温", weather["temperature"])
+        with right:
+            st.markdown(
+                f"""
+        <div class="weather-temp">
+            {weather['temperature']}
+        </div>
+        """,
+                unsafe_allow_html=True,
+            )

@@ -7,7 +7,7 @@ from services.ingredient_service import (
     get_ingredients_by_recipe,
 )
 from services.recipe_service import get_all_recipes
-
+from components.ui import show_title
 
 def show_recipe_detail_card():
     with st.container(border=True):

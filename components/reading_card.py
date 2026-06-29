@@ -14,14 +14,14 @@ def show_reading_card():
     finished_books = get_finished_books()
 
     with st.container(border=True):
-        show_title("book", "📚", "読書記録")
+        show_title("reading", "📚", "読書記録")
 
         st.divider()
 
-        st.write("### 📖 読書中")
+        show_title("reading", "📖", "読書中")
 
         if book:
-            st.write(f"**{book['title']}**")
+            st.markdown(f"**{book['title']}**")
 
             if book["author"]:
                 st.caption(book["author"])
@@ -43,13 +43,14 @@ def show_reading_card():
 
         st.divider()
 
-        st.write("### 📚 最近読了")
+        show_title("reading", "📚", "最近読了")
 
         if finished_books:
             for finished in finished_books:
                 stars = rating_to_stars(finished["rating"])
 
-                st.write(f"**{finished['title']}**　{stars}")
+                st.markdown(f"**{finished['title']}**")
+                st.caption(stars)
 
                 if finished["author"]:
                     st.caption(finished["author"])

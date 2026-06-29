@@ -32,6 +32,20 @@ def create_tables():
     cursor = conn.cursor()
 
     cursor.execute("""
+    CREATE TABLE IF NOT EXISTS garbage_rules (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        garbage_name TEXT NOT NULL,
+        icon TEXT DEFAULT '',
+        weekday INTEGER NOT NULL,
+        week_numbers TEXT DEFAULT '',
+        is_active INTEGER DEFAULT 1,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+    """)
+
+    
+    cursor.execute("""
     CREATE TABLE IF NOT EXISTS menu (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         date TEXT NOT NULL UNIQUE,
