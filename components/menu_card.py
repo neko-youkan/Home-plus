@@ -2,9 +2,9 @@ import streamlit as st
 
 from components.ui import show_title
 from services.menu_service import (
+    get_previous_menu_date,
     get_today_menu,
     save_today_menu,
-    get_previous_menu_date,
 )
 from services.recipe_service import get_random_recipe
 
@@ -14,7 +14,7 @@ def show_random_recipe_dialog():
     recipe = get_random_recipe()
 
     if recipe is None:
-        st.write("献立テンプレートがまだありません")
+        st.info("献立テンプレートがまだありません")
         return
 
     st.write(f"### {recipe['name']}")
@@ -57,7 +57,7 @@ def show_menu_card():
         st.session_state.selected_menu = "主食"
 
     with st.container(border=True):
-        show_title("menu", "🍽️", "今日の献立")
+        show_title("meal", "🍽️", "今日の献立")
 
         selected = st.segmented_control(
             "項目を選ぶ",
@@ -97,7 +97,7 @@ def show_menu_card():
 
         st.divider()
 
-        show_title("menu", "🍽️", "今日のメニュー")
+        show_title("meal", "🍱", "今日のメニュー")
 
         items = [
             ("🍚", "主食", "staple"),
