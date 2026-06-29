@@ -47,35 +47,34 @@ body,
 
     color: #FFFFFF;
 
-    font-size: 1.75rem;
-    font-weight: 800;
-    line-height: 1.2;
-    letter-spacing: 0.3px;
+    font-size: 1.55rem;
+    font-weight: 600;
+    line-height: 1.35;
+    letter-spacing: 0.1px;
 }
 
 .home-title-right {
-    color: rgba(255, 255, 255, 0.85);
-    font-size: 0.95rem;
-    font-weight: 600;
+    color: rgba(255, 255, 255, 0.78);
+    font-size: 0.92rem;
+    font-weight: 500;
     white-space: nowrap;
 
-    padding-top: 0.35rem;
+    padding-top: 0.3rem;
 }
 
 .home-title .icon {
-    font-size: 1.65rem;
+    font-size: 1.45rem;
 }
 
 .home-title-line {
     display: block;
     width: 260px;
-    height: 4px;
+    height: 3px;
 
     margin-top: 8px;
 
     border-radius: 999px;
 }
-
 .home-title.weather .home-title-line {
     background: var(--weather);
 }
@@ -152,68 +151,58 @@ hr {
     margin-top: 0.4rem;
     margin-bottom: 0.8rem;
 
-    color: rgba(255, 255, 255, 0.75);
+    color: rgba(255,255,255,.72);
 
-    font-size: 1.05rem;
-    font-weight: 700;
+    font-size: 1rem;
+    font-weight: 500;
 }
 
 .garbage-item {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: .5rem;
 
-    margin: 0.35rem 0;
+    margin: .35rem 0;
 
     color: #FFFFFF;
 
-    font-size: 1.8rem;
-    font-weight: 800;
-    line-height: 1.3;
+    font-size: 1.55rem;
+    font-weight: 600;
+    line-height: 1.35;
 }
 
 .garbage-icon {
-    font-size: 1.7rem;
+    font-size: 1.5rem;
 }
 
 /* ========= 天気カード ========= */
-
-.weather-main {
-    display: flex;
-    align-items: center;
-    gap: 18px;
-
-    min-height: 110px;
-
-    margin-top: -18px;
-}
 
 .weather-icon {
     font-size: 3rem;
 }
 
 .weather-text {
-    font-size: 2.8rem;
-    font-weight: 800;
+    font-size: 2.6rem;
+    font-weight: 600;
     line-height: 1.2;
     color: #FFFFFF;
 }
 
 .weather-right {
     text-align: right;
-    margin-top: 0.6rem;
+    margin-top: .6rem;
 }
 
 .weather-label {
-    font-size: 1rem;
-    font-weight: 700;
-    color: rgba(255, 255, 255, 0.8);
-    margin-bottom: 0.6rem;
+    font-size: .95rem;
+    font-weight: 500;
+    color: rgba(255,255,255,.78);
+    margin-bottom: .6rem;
 }
 
 .weather-temp {
-    font-size: 2.8rem;
-    font-weight: 800;
+    font-size: 2.6rem;
+    font-weight: 600;
     line-height: 1.2;
     color: #FFFFFF;
 }
@@ -225,100 +214,80 @@ hr {
     align-items: center;
     justify-content: space-between;
 
-    margin-bottom: 1.6rem;
+    margin-bottom: 1.8rem;
 }
 
 .home-header-title {
     color: #FFFFFF;
-    font-size: 3rem;
-    font-weight: 900;
+    font-size: 2.8rem;
+    font-weight: 700;
     line-height: 1.1;
+    letter-spacing: -.3px;
 }
 
 .home-header-info {
     text-align: right;
-    color: rgba(255, 255, 255, 0.75);
-    font-size: 0.95rem;
-    font-weight: 600;
+    color: rgba(255,255,255,.72);
+    font-size: .95rem;
+    font-weight: 500;
     line-height: 1.7;
 }
 
 /* ========= スマホ対応 ========= */
 
-@media screen and (max-width: 768px) {
+@media screen and (max-width:768px){
 
-    .home-header {
-        display: block;
-        margin-bottom: 1.2rem;
+    .home-header{
+        display:block;
+        margin-bottom:1.2rem;
     }
 
-    .home-header-title {
-        font-size: 2.6rem;
-        margin-bottom: 0.5rem;
+    .home-header-title{
+        font-size:2.3rem;
+        font-weight:700;
+        margin-bottom:.45rem;
     }
 
-    .home-header-info {
-        text-align: left;
-        font-size: 0.95rem;
-        line-height: 1.6;
+    .home-header-info{
+        text-align:left;
+        font-size:.9rem;
+        line-height:1.6;
     }
 
-    .home-title-row {
-        display: block;
+    .home-title-row{
+        display:block;
     }
 
-    .home-title-main {
-        font-size: 1.55rem;
+    .home-title-main{
+        font-size:1.35rem;
+        font-weight:600;
     }
 
-    .home-title-right {
-        padding-top: 0.4rem;
-        font-size: 0.9rem;
-        white-space: normal;
+    .home-title-right{
+        padding-top:.4rem;
+        font-size:.88rem;
+        font-weight:500;
+        white-space:normal;
     }
 
-    .home-title-line {
-        width: 100%;
-        max-width: 260px;
+    .home-title-line{
+        width:100%;
+        max-width:260px;
     }
 
-    div[data-testid="stVerticalBlockBorderWrapper"] {
-        padding: 18px;
-        border-radius: 16px;
+    .weather-icon{
+        font-size:2.5rem;
     }
 
-    div[data-testid="stVerticalBlockBorderWrapper"]:hover {
-        transform: none;
+    .weather-text{
+        font-size:2rem;
     }
 
-    .weather-main {
-        gap: 12px;
-        min-height: 90px;
-        margin-top: -8px;
+    .weather-temp{
+        font-size:2rem;
     }
 
-    .weather-icon {
-        font-size: 2.6rem;
-    }
-
-    .weather-text {
-        font-size: 2.25rem;
-    }
-
-    .weather-temp {
-        font-size: 2.4rem;
-    }
-
-    .garbage-item {
-        font-size: 1.55rem;
-    }
-
-    .stButton > button {
-        min-height: 44px;
-        font-size: 1rem;
-    }
-
-    hr {
-        margin: 1.2rem 0;
+    .garbage-item{
+        font-size:1.35rem;
     }
 }
