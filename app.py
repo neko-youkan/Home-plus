@@ -43,9 +43,9 @@ page = st.sidebar.radio(
     "ページ",
     [
         "🏠 Home",
-        "📚 読書記録",
-        "🛒 買い物メモ",
         "🗑️ ゴミの日",
+        "🛒 買い物メモ",
+        "📚 読書記録",
     ],
 )
 
@@ -56,11 +56,11 @@ page = st.sidebar.radio(
 if page == "🏠 Home":
     home.show()
 
-elif page == "📚 読書記録":
-    reading.show()
+elif page == "🗑️ ゴミの日":
+    garbage.show()
 
 elif page == "🛒 買い物メモ":
     shopping.show()
 
-elif page == "🗑️ ゴミの日":
-    garbage.show()
+elif page == "📚 読書記録":
+    reading.show()
