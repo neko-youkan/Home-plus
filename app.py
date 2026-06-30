@@ -2,10 +2,11 @@ from pathlib import Path
 
 import streamlit as st
 
+from pages import garbage
 from pages import home
 from pages import reading
 from pages import shopping
-from pages import garbage
+from pages import menu
 from services.db import create_tables
 
 # -------------------------
@@ -43,8 +44,9 @@ page = st.sidebar.radio(
     "ページ",
     [
         "🏠 Home",
-        "🗑️ ゴミの日",
+        "🍽️ 献立",
         "🛒 買い物メモ",
+        "🗑️ ゴミの日",
         "📚 読書記録",
     ],
 )
@@ -58,6 +60,9 @@ if page == "🏠 Home":
 
 elif page == "🗑️ ゴミの日":
     garbage.show()
+
+elif page == "🍽️ 献立":
+    menu.show()
 
 elif page == "🛒 買い物メモ":
     shopping.show()
