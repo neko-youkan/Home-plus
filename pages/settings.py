@@ -52,7 +52,7 @@ def show_profile_settings():
 
 
 def show_password_settings():
-    st.subheader("🔒 パスワード変更")
+    st.subheader("🔑 パスワード変更")
 
     with st.form("password_change_form"):
         current_password = st.text_input(
@@ -97,7 +97,7 @@ def show_account_info():
 
 
 def show_weather_settings():
-    st.subheader("🌤 天気の現在地")
+    st.subheader("📍 天気の現在地")
 
     current_location = get_setting("weather_location", "未設定")
     current_lat = get_setting("weather_lat", "")
@@ -324,23 +324,27 @@ def show_weather_settings():
 def show():
     st.title("⚙️ 設定")
 
-    tab_profile, tab_weather, tab_password, tab_account = st.tabs(
+    selected = st.radio(
+        "設定メニュー",
         [
             "👤 プロフィール",
             "📍 天気",
             "🔑 パスワード",
             "ℹ️ アカウント",
-        ]
+        ],
+        horizontal=True,
     )
 
-    with tab_profile:
+    st.divider()
+
+    if selected == "👤 プロフィール":
         show_profile_settings()
 
-    with tab_weather:
+    elif selected == "📍 天気":
         show_weather_settings()
 
-    with tab_password:
+    elif selected == "🔑 パスワード":
         show_password_settings()
 
-    with tab_account:
+    elif selected == "ℹ️ アカウント":
         show_account_info()
