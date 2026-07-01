@@ -2,12 +2,16 @@ from pathlib import Path
 
 import streamlit as st
 
-from pages import garbage
+from services.db import create_tables
+
+create_tables()
+
 from pages import home
+from pages import menu
 from pages import reading
 from pages import shopping
-from pages import menu
-from services.db import create_tables
+from pages import garbage
+from pages import settings
 
 # -------------------------
 # ページ設定
@@ -48,6 +52,7 @@ page = st.sidebar.radio(
         "🛒 買い物メモ",
         "🗑️ ゴミの日",
         "📚 読書記録",
+        "⚙️ 設定",
     ],
 )
 
@@ -69,3 +74,6 @@ elif page == "🛒 買い物メモ":
 
 elif page == "📚 読書記録":
     reading.show()
+
+elif page == "⚙️ 設定":
+    settings.show()

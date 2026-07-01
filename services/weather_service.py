@@ -1,9 +1,14 @@
 import requests
 
+from services.settings_service import get_setting
 
-LAT = 36.3910
-LON = 140.4290
-LOCATION_NAME = "水戸市石川1丁目"
+
+def get_weather_location():
+    lat = get_setting("weather_lat", "36.3910")
+    lon = get_setting("weather_lon", "140.4290")
+    location_name = get_setting("weather_location", "水戸市石川1丁目")
+
+    return float(lat), float(lon), location_name
 
 
 WEATHER_CODE = {
@@ -32,10 +37,12 @@ WEATHER_CODE = {
 def get_weather():
     """現在の天気情報を取得する"""
 
+    lat, lon, location_name = get_weather_location()
+
     url = (
         "https://api.open-meteo.com/v1/forecast"
-        f"?latitude={LAT}"
-        f"&longitude={LON}"
+        f"?latitude={lat}"
+        f"&longitude={lon}"
         "&current=temperature_2m,weather_code"
     )
 
@@ -51,18 +58,17 @@ def get_weather():
         )
 
         return {
-            "location": LOCATION_NAME,
+            "location": location_name,
             "weather": weather,
             "temperature": f'{current["temperature_2m"]:.1f}℃',
         }
 
     except Exception as e:
         return {
-            "location": LOCATION_NAME,
+            "location": location_name,
             "weather": f"取得失敗: {e}",
             "temperature": "--",
         }
-
 
 def weather_icon(weather):
     """天気に応じたアイコンを返す"""

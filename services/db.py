@@ -119,6 +119,16 @@ def create_tables():
     """)
 
 
+    cursor.execute(
+    """
+    CREATE TABLE IF NOT EXISTS settings (
+        key TEXT PRIMARY KEY,
+        value TEXT
+    )
+    """
+)
+
+
     # ===== 新しいカラムはここで追加 =====
     add_column_if_not_exists(cursor, "books", "total_pages", "INTEGER")
     add_column_if_not_exists(cursor, "books", "current_page", "INTEGER")
