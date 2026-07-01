@@ -2,16 +2,15 @@ from pathlib import Path
 
 import streamlit as st
 
-from services.db import create_tables
-
-create_tables()
-
+from components.auth import show_auth_page, show_logout_button
+from pages import garbage
 from pages import home
 from pages import menu
 from pages import reading
-from pages import shopping
-from pages import garbage
 from pages import settings
+from pages import shopping
+from services.auth_service import create_users_table
+from services.db import create_tables
 
 # -------------------------
 # ページ設定
@@ -39,6 +38,17 @@ st.markdown(
 # -------------------------
 
 create_tables()
+create_users_table()
+
+# -------------------------
+# ログインチェック
+# -------------------------
+
+if "user_id" not in st.session_state:
+    show_auth_page()
+    st.stop()
+
+show_logout_button()
 
 # -------------------------
 # サイドバー

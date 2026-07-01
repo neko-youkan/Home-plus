@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from services.db import get_connection
+from services.user_service import get_current_user_id
 
 
 def create_book(
@@ -16,12 +17,15 @@ def create_book(
 ):
     """読書記録を登録する"""
 
+    user_id = get_current_user_id()
+
     conn = get_connection()
     cursor = conn.cursor()
 
     cursor.execute(
         """
         INSERT INTO books (
+            user_id,
             title,
             author,
             start_date,
@@ -33,9 +37,10 @@ def create_book(
             current_page,
             created_at
         )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """,
         (
+            user_id,
             title,
             author,
             start_date,
@@ -58,6 +63,8 @@ def create_book(
 def get_reading_books():
     """読書中の本を取得する"""
 
+    user_id = get_current_user_id()
+
     conn = get_connection()
     cursor = conn.cursor()
 
@@ -65,9 +72,11 @@ def get_reading_books():
         """
         SELECT *
         FROM books
-        WHERE status = 'reading'
+        WHERE user_id = ?
+          AND status = 'reading'
         ORDER BY created_at DESC
-        """
+        """,
+        (user_id,),
     )
 
     books = cursor.fetchall()
@@ -79,6 +88,8 @@ def get_reading_books():
 def get_finished_books(limit=3):
     """最近読了した本を取得する"""
 
+    user_id = get_current_user_id()
+
     conn = get_connection()
     cursor = conn.cursor()
 
@@ -86,11 +97,12 @@ def get_finished_books(limit=3):
         """
         SELECT *
         FROM books
-        WHERE status = 'finished'
+        WHERE user_id = ?
+          AND status = 'finished'
         ORDER BY end_date DESC
         LIMIT ?
         """,
-        (limit,),
+        (user_id, limit),
     )
 
     books = cursor.fetchall()
@@ -102,6 +114,8 @@ def get_finished_books(limit=3):
 def get_current_reading_book():
     """現在読書中の最新1冊を取得する"""
 
+    user_id = get_current_user_id()
+
     conn = get_connection()
     cursor = conn.cursor()
 
@@ -109,14 +123,15 @@ def get_current_reading_book():
         """
         SELECT *
         FROM books
-        WHERE status = 'reading'
+        WHERE user_id = ?
+          AND status = 'reading'
         ORDER BY created_at DESC
         LIMIT 1
-        """
+        """,
+        (user_id,),
     )
 
     book = cursor.fetchone()
-
     conn.close()
 
     return book
@@ -124,6 +139,8 @@ def get_current_reading_book():
 
 def update_book_progress(book_id, current_page, total_pages):
     """読書進捗を更新する"""
+
+    user_id = get_current_user_id()
 
     conn = get_connection()
     cursor = conn.cursor()
@@ -134,8 +151,9 @@ def update_book_progress(book_id, current_page, total_pages):
         SET current_page = ?,
             total_pages = ?
         WHERE id = ?
+          AND user_id = ?
         """,
-        (current_page, total_pages, book_id),
+        (current_page, total_pages, book_id, user_id),
     )
 
     conn.commit()
@@ -146,6 +164,8 @@ def update_book_progress(book_id, current_page, total_pages):
 
 def finish_book(book_id, end_date, rating, memo):
     """読書を完了する"""
+
+    user_id = get_current_user_id()
 
     conn = get_connection()
     cursor = conn.cursor()
@@ -158,8 +178,9 @@ def finish_book(book_id, end_date, rating, memo):
             memo = ?,
             status = 'finished'
         WHERE id = ?
+          AND user_id = ?
         """,
-        (end_date, rating, memo, book_id),
+        (end_date, rating, memo, book_id, user_id),
     )
 
     conn.commit()
@@ -171,6 +192,8 @@ def finish_book(book_id, end_date, rating, memo):
 def delete_book(book_id):
     """読書記録を削除する"""
 
+    user_id = get_current_user_id()
+
     conn = get_connection()
     cursor = conn.cursor()
 
@@ -178,8 +201,9 @@ def delete_book(book_id):
         """
         DELETE FROM books
         WHERE id = ?
+          AND user_id = ?
         """,
-        (book_id,),
+        (book_id, user_id),
     )
 
     conn.commit()

@@ -1,13 +1,19 @@
-from services.db import get_connection
 from datetime import date, timedelta
+
+from services.db import get_connection
+from services.user_service import get_current_user_id
+
 
 def get_week_number(target_date):
     """第何週かを返す"""
 
     return (target_date.day - 1) // 7 + 1
 
+
 def get_all_garbage_rules():
     """ごみ収集ルール一覧を取得"""
+
+    user_id = get_current_user_id()
 
     conn = get_connection()
     cursor = conn.cursor()
@@ -22,9 +28,11 @@ def get_all_garbage_rules():
             week_numbers,
             is_active
         FROM garbage_rules
-        WHERE is_active = 1
+        WHERE user_id = ?
+          AND is_active = 1
         ORDER BY weekday, garbage_name
-        """
+        """,
+        (user_id,),
     )
 
     rows = cursor.fetchall()
@@ -32,17 +40,12 @@ def get_all_garbage_rules():
 
     return rows
 
+
 def is_match(rule, target_date):
     """ルールに一致するか"""
 
-    (
-        _,
-        _,
-        _,
-        weekday,
-        week_numbers,
-        _,
-    ) = rule
+    weekday = rule["weekday"]
+    week_numbers = rule["week_numbers"]
 
     if target_date.weekday() != weekday:
         return False
@@ -53,6 +56,7 @@ def is_match(rule, target_date):
     week = get_week_number(target_date)
 
     return str(week) in week_numbers.split(",")
+
 
 def get_next_garbage_day():
     """次のごみの日を取得"""
@@ -78,6 +82,7 @@ def get_next_garbage_day():
 
     return None
 
+
 def create_garbage_rule(
     garbage_name,
     icon,
@@ -86,20 +91,24 @@ def create_garbage_rule(
 ):
     """ごみ収集ルールを追加"""
 
+    user_id = get_current_user_id()
+
     conn = get_connection()
     cursor = conn.cursor()
 
     cursor.execute(
         """
         INSERT INTO garbage_rules (
+            user_id,
             garbage_name,
             icon,
             weekday,
             week_numbers
         )
-        VALUES (?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?)
         """,
         (
+            user_id,
             garbage_name,
             icon,
             weekday,
@@ -119,6 +128,8 @@ def create_garbage_rule(
 def delete_garbage_rule(rule_id):
     """ごみ収集ルールを削除"""
 
+    user_id = get_current_user_id()
+
     conn = get_connection()
     cursor = conn.cursor()
 
@@ -126,8 +137,9 @@ def delete_garbage_rule(rule_id):
         """
         DELETE FROM garbage_rules
         WHERE id = ?
+          AND user_id = ?
         """,
-        (rule_id,),
+        (rule_id, user_id),
     )
 
     conn.commit()

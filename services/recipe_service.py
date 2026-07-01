@@ -1,6 +1,7 @@
 import random
 
 from services.db import get_connection
+from services.user_service import get_current_user_id
 
 
 def add_recipe(name, staple="", main_dish="", side_dish="", soup=""):
@@ -9,15 +10,25 @@ def add_recipe(name, staple="", main_dish="", side_dish="", soup=""):
     if not name.strip():
         return {"success": False, "message": "献立名を入力してね"}
 
+    user_id = get_current_user_id()
+
     conn = get_connection()
     cursor = conn.cursor()
 
     cursor.execute(
         """
-        INSERT INTO recipes (name, staple, main_dish, side_dish, soup)
-        VALUES (?, ?, ?, ?, ?)
+        INSERT INTO recipes (
+            user_id,
+            name,
+            staple,
+            main_dish,
+            side_dish,
+            soup
+        )
+        VALUES (?, ?, ?, ?, ?, ?)
         """,
         (
+            user_id,
             name.strip(),
             staple.strip(),
             main_dish.strip(),
@@ -41,6 +52,8 @@ def add_recipe(name, staple="", main_dish="", side_dish="", soup=""):
 def get_all_recipes():
     """献立テンプレートをすべて取得する"""
 
+    user_id = get_current_user_id()
+
     conn = get_connection()
     cursor = conn.cursor()
 
@@ -48,8 +61,10 @@ def get_all_recipes():
         """
         SELECT id, name, staple, main_dish, side_dish, soup
         FROM recipes
+        WHERE user_id = ?
         ORDER BY created_at DESC
-        """
+        """,
+        (user_id,),
     )
 
     rows = cursor.fetchall()
@@ -57,12 +72,12 @@ def get_all_recipes():
 
     return [
         {
-            "id": row[0],
-            "name": row[1],
-            "staple": row[2] or "",
-            "main_dish": row[3] or "",
-            "side_dish": row[4] or "",
-            "soup": row[5] or "",
+            "id": row["id"],
+            "name": row["name"],
+            "staple": row["staple"] or "",
+            "main_dish": row["main_dish"] or "",
+            "side_dish": row["side_dish"] or "",
+            "soup": row["soup"] or "",
         }
         for row in rows
     ]
@@ -82,6 +97,8 @@ def get_random_recipe():
 def save_recipe_ingredients(recipe_id, ingredients):
     """レシピの材料を保存する"""
 
+    user_id = get_current_user_id()
+
     conn = get_connection()
     cursor = conn.cursor()
 
@@ -89,8 +106,9 @@ def save_recipe_ingredients(recipe_id, ingredients):
         """
         DELETE FROM recipe_ingredients
         WHERE recipe_id = ?
+          AND user_id = ?
         """,
-        (recipe_id,),
+        (recipe_id, user_id),
     )
 
     for ingredient in ingredients:
@@ -99,11 +117,14 @@ def save_recipe_ingredients(recipe_id, ingredients):
         if ingredient:
             cursor.execute(
                 """
-                INSERT INTO recipe_ingredients
-                (recipe_id, ingredient_name)
-                VALUES (?, ?)
+                INSERT INTO recipe_ingredients (
+                    user_id,
+                    recipe_id,
+                    ingredient_name
+                )
+                VALUES (?, ?, ?)
                 """,
-                (recipe_id, ingredient),
+                (user_id, recipe_id, ingredient),
             )
 
     conn.commit()
@@ -113,6 +134,8 @@ def save_recipe_ingredients(recipe_id, ingredients):
 def get_recipe_ingredients(recipe_id):
     """レシピの材料一覧を取得する"""
 
+    user_id = get_current_user_id()
+
     conn = get_connection()
     cursor = conn.cursor()
 
@@ -121,15 +144,16 @@ def get_recipe_ingredients(recipe_id):
         SELECT ingredient_name
         FROM recipe_ingredients
         WHERE recipe_id = ?
+          AND user_id = ?
         ORDER BY id
         """,
-        (recipe_id,),
+        (recipe_id, user_id),
     )
 
     rows = cursor.fetchall()
     conn.close()
 
-    return [row[0] for row in rows]
+    return [row["ingredient_name"] for row in rows]
 
 
 def get_ingredients_from_recipe_ids(recipe_ids):
@@ -137,6 +161,8 @@ def get_ingredients_from_recipe_ids(recipe_ids):
 
     if not recipe_ids:
         return []
+
+    user_id = get_current_user_id()
 
     conn = get_connection()
     cursor = conn.cursor()
@@ -147,13 +173,14 @@ def get_ingredients_from_recipe_ids(recipe_ids):
         f"""
         SELECT DISTINCT ingredient_name
         FROM recipe_ingredients
-        WHERE recipe_id IN ({placeholders})
+        WHERE user_id = ?
+          AND recipe_id IN ({placeholders})
         ORDER BY ingredient_name
         """,
-        recipe_ids,
+        [user_id, *recipe_ids],
     )
 
     rows = cursor.fetchall()
     conn.close()
 
-    return [row[0] for row in rows]
+    return [row["ingredient_name"] for row in rows]

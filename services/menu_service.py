@@ -1,11 +1,13 @@
 from datetime import date, datetime
 
 from services.db import get_connection
+from services.user_service import get_current_user_id
 
 
 def save_today_menu(staple="", main_dish="", side_dish="", soup=""):
     """今日の献立を保存・更新する"""
 
+    user_id = get_current_user_id()
     today = date.today().isoformat()
 
     conn = get_connection()
@@ -13,16 +15,30 @@ def save_today_menu(staple="", main_dish="", side_dish="", soup=""):
 
     cursor.execute(
         """
-        INSERT INTO menu (date, staple, main_dish, side_dish, soup)
-        VALUES (?, ?, ?, ?, ?)
-        ON CONFLICT(date) DO UPDATE SET
+        INSERT INTO menu (
+            user_id,
+            date,
+            staple,
+            main_dish,
+            side_dish,
+            soup
+        )
+        VALUES (?, ?, ?, ?, ?, ?)
+        ON CONFLICT(user_id, date) DO UPDATE SET
             staple = excluded.staple,
             main_dish = excluded.main_dish,
             side_dish = excluded.side_dish,
             soup = excluded.soup,
             updated_at = CURRENT_TIMESTAMP
         """,
-        (today, staple, main_dish, side_dish, soup),
+        (
+            user_id,
+            today,
+            staple,
+            main_dish,
+            side_dish,
+            soup,
+        ),
     )
 
     conn.commit()
@@ -34,6 +50,7 @@ def save_today_menu(staple="", main_dish="", side_dish="", soup=""):
 def get_today_menu():
     """今日の献立を取得する"""
 
+    user_id = get_current_user_id()
     today = date.today().isoformat()
 
     conn = get_connection()
@@ -43,9 +60,10 @@ def get_today_menu():
         """
         SELECT id, date, staple, main_dish, side_dish, soup
         FROM menu
-        WHERE date = ?
+        WHERE user_id = ?
+          AND date = ?
         """,
-        (today,),
+        (user_id, today),
     )
 
     row = cursor.fetchone()
@@ -60,12 +78,12 @@ def get_today_menu():
         }
 
     return {
-        "id": row[0],
-        "date": row[1],
-        "staple": row[2] or "",
-        "main_dish": row[3] or "",
-        "side_dish": row[4] or "",
-        "soup": row[5] or "",
+        "id": row["id"],
+        "date": row["date"],
+        "staple": row["staple"] or "",
+        "main_dish": row["main_dish"] or "",
+        "side_dish": row["side_dish"] or "",
+        "soup": row["soup"] or "",
     }
 
 
@@ -80,6 +98,7 @@ def get_previous_menu_date(item_type, value):
     if not value:
         return None
 
+    user_id = get_current_user_id()
     today = date.today().isoformat()
 
     conn = get_connection()
@@ -88,20 +107,22 @@ def get_previous_menu_date(item_type, value):
     query = f"""
         SELECT date
         FROM menu
-        WHERE {item_type} = ?
+        WHERE user_id = ?
+          AND {item_type} = ?
           AND date < ?
         ORDER BY date DESC
         LIMIT 1
     """
 
-    cursor.execute(query, (value, today))
+    cursor.execute(query, (user_id, value, today))
+
     row = cursor.fetchone()
     conn.close()
 
     if row is None:
         return None
 
-    previous_date = datetime.strptime(row[0], "%Y-%m-%d").date()
+    previous_date = datetime.strptime(row["date"], "%Y-%m-%d").date()
     days = (date.today() - previous_date).days
 
     return {

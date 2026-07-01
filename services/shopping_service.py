@@ -2,22 +2,36 @@
 買い物メモサービス
 """
 
+import streamlit as st
+
 from services.db import get_connection
 from services.recipe_service import get_ingredients_from_recipe_ids
 from services.weekly_menu_service import get_weekly_menu
 
 
+def get_current_user_id():
+    """ログイン中のユーザーIDを取得する"""
+
+    return st.session_state.user_id
+
+
 def get_shopping_list():
     """買い物メモ一覧を取得する"""
+
+    user_id = get_current_user_id()
 
     conn = get_connection()
     cursor = conn.cursor()
 
-    cursor.execute("""
+    cursor.execute(
+        """
         SELECT *
         FROM shopping_items
+        WHERE user_id = ?
         ORDER BY created_at DESC
-    """)
+        """,
+        (user_id,),
+    )
 
     items = cursor.fetchall()
 
@@ -29,13 +43,18 @@ def get_shopping_list():
 def add_shopping_item(item_name):
     """買い物メモを追加する"""
 
+    user_id = get_current_user_id()
+
     conn = get_connection()
     cursor = conn.cursor()
 
-    cursor.execute("""
-        INSERT INTO shopping_items (item_name)
-        VALUES (?)
-    """, (item_name,))
+    cursor.execute(
+        """
+        INSERT INTO shopping_items (user_id, item_name)
+        VALUES (?, ?)
+        """,
+        (user_id, item_name),
+    )
 
     conn.commit()
     conn.close()
@@ -44,14 +63,20 @@ def add_shopping_item(item_name):
 def update_shopping_status(item_id, is_checked):
     """購入状態を更新する"""
 
+    user_id = get_current_user_id()
+
     conn = get_connection()
     cursor = conn.cursor()
 
-    cursor.execute("""
+    cursor.execute(
+        """
         UPDATE shopping_items
         SET is_checked = ?
         WHERE id = ?
-    """, (is_checked, item_id))
+          AND user_id = ?
+        """,
+        (is_checked, item_id, user_id),
+    )
 
     conn.commit()
     conn.close()
@@ -60,15 +85,21 @@ def update_shopping_status(item_id, is_checked):
 def get_unchecked_shopping_list():
     """未購入の買い物メモだけ取得する"""
 
+    user_id = get_current_user_id()
+
     conn = get_connection()
     cursor = conn.cursor()
 
-    cursor.execute("""
+    cursor.execute(
+        """
         SELECT *
         FROM shopping_items
         WHERE is_checked = 0
+          AND user_id = ?
         ORDER BY created_at DESC
-    """)
+        """,
+        (user_id,),
+    )
 
     items = cursor.fetchall()
 
@@ -80,13 +111,19 @@ def get_unchecked_shopping_list():
 def delete_shopping_item(item_id):
     """買い物メモを削除する"""
 
+    user_id = get_current_user_id()
+
     conn = get_connection()
     cursor = conn.cursor()
 
-    cursor.execute("""
+    cursor.execute(
+        """
         DELETE FROM shopping_items
         WHERE id = ?
-    """, (item_id,))
+          AND user_id = ?
+        """,
+        (item_id, user_id),
+    )
 
     conn.commit()
     conn.close()
@@ -95,24 +132,32 @@ def delete_shopping_item(item_id):
 def get_existing_unchecked_item_names():
     """未購入の買い物メモ名を取得する"""
 
+    user_id = get_current_user_id()
+
     conn = get_connection()
     cursor = conn.cursor()
 
-    cursor.execute("""
+    cursor.execute(
+        """
         SELECT item_name
         FROM shopping_items
         WHERE is_checked = 0
-    """)
+          AND user_id = ?
+        """,
+        (user_id,),
+    )
 
     rows = cursor.fetchall()
 
     conn.close()
 
-    return [row[0] for row in rows]
+    return [row["item_name"] for row in rows]
 
 
 def generate_shopping_from_weekly_menu():
     """今週の献立から買い物メモを生成する"""
+
+    user_id = get_current_user_id()
 
     weekly_menu = get_weekly_menu()
 
@@ -158,10 +203,13 @@ def generate_shopping_from_weekly_menu():
         if ingredient in existing_item_set:
             continue
 
-        cursor.execute("""
-            INSERT INTO shopping_items (item_name)
-            VALUES (?)
-        """, (ingredient,))
+        cursor.execute(
+            """
+            INSERT INTO shopping_items (user_id, item_name)
+            VALUES (?, ?)
+            """,
+            (user_id, ingredient),
+        )
 
         added_items.append(ingredient)
 
