@@ -130,3 +130,65 @@ def login_user(username, password):
         "user_id": user_id,
         "username": username,
     }
+
+def change_password(user_id, current_password, new_password):
+    """パスワードを変更"""
+
+    if not current_password or not new_password:
+        return {
+            "success": False,
+            "message": "現在のパスワードと新しいパスワードを入力してください",
+        }
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute(
+        """
+        SELECT password_hash
+        FROM users
+        WHERE id = ?
+        """,
+        (user_id,),
+    )
+
+    user = cursor.fetchone()
+
+    if user is None:
+        conn.close()
+        return {
+            "success": False,
+            "message": "ユーザーが見つかりません",
+        }
+
+    if not check_password(
+        current_password,
+        user["password_hash"],
+    ):
+        conn.close()
+        return {
+            "success": False,
+            "message": "現在のパスワードが違います",
+        }
+
+    new_password_hash = hash_password(new_password)
+
+    cursor.execute(
+        """
+        UPDATE users
+        SET password_hash = ?
+        WHERE id = ?
+        """,
+        (
+            new_password_hash,
+            user_id,
+        ),
+    )
+
+    conn.commit()
+    conn.close()
+
+    return {
+        "success": True,
+        "message": "パスワードを変更しました",
+    }

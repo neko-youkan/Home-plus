@@ -3,8 +3,10 @@ import json
 import streamlit as st
 from streamlit_js_eval import get_geolocation
 
+from services.auth_service import change_password
 from services.geocoding_service import search_location
 from services.settings_service import get_setting, save_setting
+from services.user_service import get_current_user_id, get_current_username
 
 
 def load_favorite_locations():
@@ -25,9 +27,76 @@ def save_weather_location(location_name, lat, lon):
     save_setting("weather_lon", lon)
 
 
-def show():
-    st.title("⚙️ 設定")
+def show_profile_settings():
+    st.subheader("👤 プロフィール")
 
+    current_display_name = get_setting(
+        "display_name",
+        get_current_username(),
+    )
+
+    display_name = st.text_input(
+        "表示名",
+        value=current_display_name,
+        placeholder="例：ねこ羊羹",
+    )
+
+    if st.button("プロフィールを保存"):
+        if not display_name.strip():
+            st.warning("表示名を入力してください")
+            return
+
+        save_setting("display_name", display_name.strip())
+        st.success("プロフィールを保存しました")
+        st.rerun()
+
+
+def show_password_settings():
+    st.subheader("🔒 パスワード変更")
+
+    with st.form("password_change_form"):
+        current_password = st.text_input(
+            "現在のパスワード",
+            type="password",
+        )
+
+        new_password = st.text_input(
+            "新しいパスワード",
+            type="password",
+        )
+
+        new_password_confirm = st.text_input(
+            "新しいパスワード（確認）",
+            type="password",
+        )
+
+        submitted = st.form_submit_button("パスワードを変更")
+
+        if submitted:
+            if new_password != new_password_confirm:
+                st.error("新しいパスワードが一致しません")
+                return
+
+            result = change_password(
+                get_current_user_id(),
+                current_password,
+                new_password,
+            )
+
+            if result["success"]:
+                st.success(result["message"])
+            else:
+                st.error(result["message"])
+
+
+def show_account_info():
+    st.subheader("ℹ️ アカウント情報")
+
+    st.write(f"ユーザー名：**{get_current_username()}**")
+    st.write(f"ユーザーID：`{get_current_user_id()}`")
+
+
+def show_weather_settings():
     st.subheader("🌤 天気の現在地")
 
     current_location = get_setting("weather_location", "未設定")
@@ -36,9 +105,6 @@ def show():
 
     st.write(f"現在の設定：**{current_location}**")
 
-    # -----------------------------
-    # 住所から設定
-    # -----------------------------
     st.markdown("### 住所から設定")
 
     address = st.text_input(
@@ -48,7 +114,7 @@ def show():
     )
 
     display_name = st.text_input(
-        "表示名",
+        "地点の表示名",
         value="" if current_location == "未設定" else current_location,
         placeholder="例：自宅 / 実家 / 職場",
     )
@@ -77,9 +143,6 @@ def show():
 
     st.divider()
 
-    # -----------------------------
-    # GPS
-    # -----------------------------
     st.markdown("### 📍 現在地から設定")
 
     location = get_geolocation()
@@ -113,15 +176,11 @@ def show():
 
     st.divider()
 
-    # -----------------------------
-    # お気に入り
-    # -----------------------------
     st.markdown("### ⭐ お気に入り地点")
 
     favorites = load_favorite_locations()
 
     if favorites:
-
         favorite_names = [
             item["name"]
             for item in favorites
@@ -153,15 +212,10 @@ def show():
 
         with col2:
             if st.button("🗑️ 削除"):
-
                 favorites.remove(selected)
                 save_favorite_locations(favorites)
 
-                if current_location == selected["name"]:
-                    st.warning("現在地を削除しました。")
-                else:
-                    st.success("削除しました")
-
+                st.success("削除しました")
                 st.rerun()
 
         st.markdown("#### ✏️ 名前を変更")
@@ -173,7 +227,6 @@ def show():
         )
 
         if st.button("名前を変更"):
-
             if not new_name:
                 st.warning("名前を入力してください")
                 return
@@ -209,7 +262,6 @@ def show():
     )
 
     if st.button("お気に入りに追加"):
-
         if not current_lat or not current_lon:
             st.warning("先に現在地を設定してください")
             return
@@ -240,9 +292,6 @@ def show():
 
     st.divider()
 
-    # -----------------------------
-    # 手動設定
-    # -----------------------------
     st.markdown("### 手動で緯度・経度を設定")
 
     lat = st.text_input(
@@ -270,3 +319,28 @@ def show():
 
         st.success("手動設定を保存しました")
         st.rerun()
+
+
+def show():
+    st.title("⚙️ 設定")
+
+    tab_profile, tab_weather, tab_password, tab_account = st.tabs(
+        [
+            "👤 プロフィール",
+            "📍 天気",
+            "🔑 パスワード",
+            "ℹ️ アカウント",
+        ]
+    )
+
+    with tab_profile:
+        show_profile_settings()
+
+    with tab_weather:
+        show_weather_settings()
+
+    with tab_password:
+        show_password_settings()
+
+    with tab_account:
+        show_account_info()
