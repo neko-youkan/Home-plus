@@ -84,7 +84,7 @@ def show():
 
     location = get_geolocation()
 
-    if location:
+    if location and "coords" in location:
         coords = location["coords"]
 
         gps_lat = coords["latitude"]
