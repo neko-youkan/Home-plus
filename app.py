@@ -3,6 +3,7 @@ from pathlib import Path
 import streamlit as st
 
 from components.auth import show_auth_page, show_logout_button
+from pages import admin
 from pages import garbage
 from pages import home
 from pages import menu
@@ -11,6 +12,11 @@ from pages import settings
 from pages import shopping
 from services.auth_service import create_users_table
 from services.db import create_tables
+from services.user_service import (
+    get_current_user_id,
+    get_current_username,
+)
+from services.admin_service import is_admin_user
 
 # -------------------------
 # ページ設定
@@ -54,16 +60,21 @@ show_logout_button()
 # サイドバー
 # -------------------------
 
+pages = [
+    "🏠 Home",
+    "🍽️ 献立",
+    "🛒 買い物メモ",
+    "🗑️ ゴミの日",
+    "📚 読書記録",
+    "⚙️ 設定",
+]
+
+if is_admin_user(get_current_user_id()):
+    pages.append("🛠️ 管理者")
+
 page = st.sidebar.radio(
     "ページ",
-    [
-        "🏠 Home",
-        "🍽️ 献立",
-        "🛒 買い物メモ",
-        "🗑️ ゴミの日",
-        "📚 読書記録",
-        "⚙️ 設定",
-    ],
+    pages,
 )
 
 # -------------------------
@@ -87,3 +98,6 @@ elif page == "📚 読書記録":
 
 elif page == "⚙️ 設定":
     settings.show()
+
+elif page == "🛠️ 管理者":
+    admin.show()

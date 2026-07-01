@@ -15,8 +15,28 @@ def create_users_table():
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             username TEXT NOT NULL UNIQUE,
             password_hash TEXT NOT NULL,
+            is_admin INTEGER DEFAULT 0,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
+        """
+    )
+
+    cursor.execute("PRAGMA table_info(users)")
+    columns = [row["name"] for row in cursor.fetchall()]
+
+    if "is_admin" not in columns:
+        cursor.execute(
+            """
+            ALTER TABLE users
+            ADD COLUMN is_admin INTEGER DEFAULT 0
+            """
+        )
+
+    cursor.execute(
+        """
+        UPDATE users
+        SET is_admin = 1
+        WHERE username = 'admin'
         """
     )
 
@@ -40,6 +60,30 @@ def check_password(password, password_hash):
         password.encode("utf-8"),
         password_hash.encode("utf-8"),
     )
+
+
+def record_login(user_id, username):
+    """ログイン履歴を記録"""
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute(
+        """
+        INSERT INTO login_logs (
+            user_id,
+            username
+        )
+        VALUES (?, ?)
+        """,
+        (
+            user_id,
+            username,
+        ),
+    )
+
+    conn.commit()
+    conn.close()
 
 
 def register_user(username, password):
@@ -107,7 +151,6 @@ def login_user(username, password):
     )
 
     user = cursor.fetchone()
-
     conn.close()
 
     if user is None:
@@ -116,7 +159,9 @@ def login_user(username, password):
             "message": "ユーザー名またはパスワードが違います",
         }
 
-    user_id, username, password_hash = user
+    user_id = user["id"]
+    username = user["username"]
+    password_hash = user["password_hash"]
 
     if not check_password(password, password_hash):
         return {
@@ -124,12 +169,15 @@ def login_user(username, password):
             "message": "ユーザー名またはパスワードが違います",
         }
 
+    record_login(user_id, username)
+
     return {
         "success": True,
         "message": "ログインしました",
         "user_id": user_id,
         "username": username,
     }
+
 
 def change_password(user_id, current_password, new_password):
     """パスワードを変更"""
