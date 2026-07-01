@@ -6,7 +6,7 @@ from services.settings_service import get_setting
 def get_weather_location():
     lat = get_setting("weather_lat", "36.3910")
     lon = get_setting("weather_lon", "140.4290")
-    location_name = get_setting("weather_location", "水戸市石川1丁目")
+    location_name = get_setting("weather_location", "東京都千代田区")
 
     return float(lat), float(lon), location_name
 
